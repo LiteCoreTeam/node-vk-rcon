@@ -1,7 +1,8 @@
 {
     "access_token": "Your group access token...",
+    "group_id": 0,
     "rcon": {
-        "address": "Port",
+        "address": "...",
         "port": 19132
     }
 }

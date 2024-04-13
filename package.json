@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/LiteCoreTeam/node-vk-rcon/issues"
   },
-  "homepage": "https://github.com/LiteCoreTeam/node-vk-rcon#readme"
+  "homepage": "https://github.com/LiteCoreTeam/node-vk-rcon#readme",
+  "dependencies": {
+    "vk-io": "^4.9.1"
+  }
 }
