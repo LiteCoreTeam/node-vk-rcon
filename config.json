@@ -2,7 +2,8 @@
     "access_token": "Your group access token...",
     "group_id": 0,
     "rcon": {
-        "address": "...",
-        "port": 19132
+        "address": "Your RCON server address...",
+        "port": "Your RCON server port...",
+        "password": "Your RCON password..."
     }
 }
