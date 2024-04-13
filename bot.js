@@ -9,4 +9,8 @@
 const config = require("./config.json");
 const rcon = require("./src/MinecraftRCON");
 const VK = require("vk-io");
-const vk = new VK({});
+const vk = new VK({
+    token: config.access_token
+});
+
+console.log("OK.");
