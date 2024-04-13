@@ -7,7 +7,8 @@
  */
 
 const config = require("./config.json");
-const rcon = require("./src/MinecraftRCON");
+const RCON = require("./src/MinecraftRCON");
+let 
 const { VK } = require("vk-io");
 const vk = new VK({
     token: config.access_token,
@@ -21,6 +22,7 @@ vk.updates.on(["message_new"], async (context)=> {
 
     if(context.text.indexOf("/")) {
         let string = context.text.substring(1);
+        let connection = rcon.connect();
     }
 });
 
