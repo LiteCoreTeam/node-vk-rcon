@@ -12,17 +12,17 @@ const vk = new VK({
 
 vk.updates.on(["message_new"], async (context)=> {
     if(context.senderId < 0) return;
-    if(context.text.indexOf("/")) {
+    if(context.text[0] == "/") {
         let args = (context.text.substring(1)).split(" ");
         let commandName = args.shift();
         if(args.length == 0) args = null;
 
-        if((config.rcon.settings.admins).includes(context.senderId)) {
+        if(!((config.rcon.settings.admins).includes(context.senderId))) {
             context.send("Вы не можете отправлять запросы к RCON сервера!");
             return;
         }
     
-        if((config.rcon.settings.block_commands).includes(commandName)) {
+        if(!((config.rcon.settings.block_commands).includes(commandName))) {
             context.send("Использование данной команды запрещено!");
             return;
         }
