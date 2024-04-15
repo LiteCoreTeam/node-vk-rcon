@@ -1,5 +1,3 @@
-const allowedUsers = [1,2,3]; //Айдишники вк тех, кому можно юзать бота
-const notAllowedCommands = ["op", "deop", "stop"]; //Команды которые нельзя использовать
 const config = require("./config.json");
 
 const RCON = require("./src/MinecraftRCON");
@@ -8,7 +6,8 @@ const rcon = new RCON(config.rcon.address, config.rcon.port, config.rcon.passwor
 const { VK } = require("vk-io");
 const vk = new VK({
     token: config.access_token,
-    pollingGroupId: config.group_id
+    pollingGroupId: config.group_id,
+    apiVersion: config.api_version
 });
 
 vk.updates.on(["message_new"], async (context)=> {
@@ -18,12 +17,12 @@ vk.updates.on(["message_new"], async (context)=> {
         let commandName = args.shift();
         if(args.length == 0) args = null;
 
-        if(allowedUsers.includes(context.senderId)) {
+        if((config.rcon.settings.admins).includes(context.senderId)) {
             context.send("Вы не можете отправлять запросы к RCON сервера!");
             return;
         }
     
-        if(notAllowedCommands.includes(commandName)) {
+        if((config.rcon.settings.block_commands).includes(commandName)) {
             context.send("Использование данной команды запрещено!");
             return;
         }

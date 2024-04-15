@@ -1,9 +1,14 @@
 {
-    "access_token": "Your group access token...",
-    "group_id": 0,
+    "access_token": "vk1.a.eHRq0QbI_XxaTR7z0DLuHVetTeAF8lG-LXUqZIu0nXXmn3kqI5l4eSIOHXlTo_P0ZmD4NxOGivxD_mHYsZHuhrxYVXIyOdTGgi222RV-_QRathKzx28AwZLpzYAa8EzCHq5FwnIyCv_0KxDloEfryLTHtkZwyEDRr2vWeuNrLYyhm0PiaiDe5iSG0hfTcxF7h1xPtYWFMWOtRfuFfCue8g",
+    "group_id": "0",
+    "api_version": "5.199",
     "rcon": {
         "address": "Your RCON server address...",
         "port": "Your RCON server port...",
-        "password": "Your RCON password..."
+        "password": "Your RCON password...",
+        "settings": {
+            "admins": [1, 560942035],
+            "block_commands": ["op", "deop", "stop"]
+        }
     }
 }
