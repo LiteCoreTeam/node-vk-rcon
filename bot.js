@@ -44,4 +44,4 @@ vk.updates.start().then(()=> {
 * @vk https://vk.com/litecore_team
 * @telegram https://t.me/litecoreteam
 `);
-});
+}).catch((err)=> console.error(err));
