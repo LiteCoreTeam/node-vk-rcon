@@ -15,23 +15,31 @@ vk.updates.on(["message_new"], async (context)=> {
     if(context.text[0] == "/") {
         let args = (context.text.substring(1)).split(" ");
         let commandName = args.shift();
-        if(args.length == 0) args = null;
+        console.log(commandName);
 
-        if(!((config.rcon.settings.admins).includes(context.senderId))) {
+        if(!(config.rcon.settings.admins.includes(context.senderId))) {
             context.send("Вы не можете отправлять запросы к RCON сервера!");
             return;
         }
     
-        if(!((config.rcon.settings.block_commands).includes(commandName))) {
+        if(config.rcon.settings.block_commands.includes(commandName.toLowerCase())) {
             context.send("Использование данной команды запрещено!");
             return;
         }
 
         let connection = rcon.connect();
-        let command = (`${commandName} ${args.slice(" ")}`).trim();
-        rcon.sendCommand(connection, command);
+        let command = (`/${commandName} ${args.slice(" ")}`).trim();
+        await rcon.sendCommand(connection, command).then(answer=> context.send("Ответ сервера:\n" + answer))
+        .catch(err=> {
+            context.send("Произошла ошибка:\n" + err);
+            console.error(err);
+        });
+
         rcon.disconnect(connection);
+        return;
     }
+    context.send("Используйте: /команда");
+    return;
 });
 
 vk.updates.start().then(()=> {
