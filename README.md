@@ -13,14 +13,14 @@ __1. Заполните файл "config.json" со следующей стру�
 ```json
 {
   "bot_settings": {
-    "super_admins": ["id1", "id2"],
-    "admins": ["id3", "id4"],
+    "super_admins": [3434, 2323],
+    "admins": [13245, 3534],
     "block_commands": ["команда1", "команда2"]
   },
   "rcon_settings": {
-    "address": "127.0.0.1",
-    "port": 25575,
-    "password": "пароль"
+    "address": "localhost",
+    "port": "19132",
+    "password": "RCON пароль"
   }
 }
 ```
