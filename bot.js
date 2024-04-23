@@ -1,54 +1,102 @@
-const config = require("./config.json");
+const config = require('./config.json');
+const { super_admins, admins, block_commands } = config.bot_settings;
+const { address, port, password } = config.rcon_settings;
 
-const RCON = require("./src/MinecraftRCON");
-const rcon = new RCON(config.rcon.address, config.rcon.port, config.rcon.password);
+const Rcon = require('rcon');
+const rcon = new Rcon(address, port, password, {
+    tcp: true,
+    challenge: true
+});
+rcon.connect();
 
-const { VK } = require("vk-io");
+const { VK } = require('vk-io');
 const vk = new VK({
     token: config.access_token,
     pollingGroupId: config.group_id,
     apiVersion: config.api_version
 });
 
-vk.updates.on(["message_new"], async (context)=> {
-    if(context.senderId < 0) return;
-    if(context.text[0] == "/") {
-        let args = (context.text.substring(1)).split(" ");
-        let commandName = args.shift();
-        console.log(commandName);
+const { updates } = vk;
 
-        if(!(config.rcon.settings.admins.includes(context.senderId))) {
-            context.send("Вы не можете отправлять запросы к RCON сервера!");
-            return;
-        }
-    
-        if(config.rcon.settings.block_commands.includes(commandName.toLowerCase())) {
-            context.send("Использование данной команды запрещено!");
-            return;
-        }
+const sendCommand = async (command) => {
+    let response;
 
-        let connection = rcon.connect();
-        let command = (`/${commandName} ${args.slice(" ")}`).trim();
-        await rcon.sendCommand(connection, command).then(answer=> context.send("Ответ сервера:\n" + answer))
-        .catch(err=> {
-            context.send("Произошла ошибка:\n" + err);
-            console.error(err);
+    try {
+        rcon.send(command);
+        response = await new Promise((resolve, reject) => {
+            rcon.once('response', (res) => {
+                if(res == '') {
+                    resolve('Сервер не вернул ответа. Но команда успешно отправлена!');
+                }
+                resolve(res);
+            });
+
+            setTimeout(() => {
+                reject('Сервер не ответил вовремя.');
+            }, 10000);
         });
+    } catch (error) {
+        console.error('При отправке команды произошла ошибка:', error);
 
-        rcon.disconnect(connection);
-        return;
+        return 'При выполнении произошла ошибка.\nВозможно, сервер или RCON отключены!';
     }
-    context.send("Используйте: /команда");
-    return;
+
+    if (response === undefined) {
+        response = 'Сервер не вернул ответа.';
+    }
+
+    return response;
+};
+
+updates.on(['message_new'], async (context, next) => {
+    const { text, senderId, id } = context;
+    const startSymbol = text.substring(0, 1);
+
+    if(startSymbol == "/") {
+        const [ command, ...args ] = text.substring(1).split(' ');
+
+        console.log('Команда: ', command);
+
+        if (super_admins.includes(senderId)) {
+            const resp = await sendCommand(`${command} ${args.slice(' ')}`);
+
+            context.send('Результат выполнения команды:\n\n' + resp, {
+                reply_to: id
+            });
+        } else if (admins.includes(senderId)) {
+            if (block_commands.includes(command.toLowerCase())) {
+                context.send('Вы не можете использовать данную команду!', {
+                    reply_to: id
+                });
+            } else {
+                const resp = await sendCommand(`${command} ${args.slice(' ')}`);
+
+                context.send('Результат выполнения команды:\n\n' + resp, {
+                    reply_to: id
+                });
+            }
+        } else {
+            context.send('У вас нет прав на использование RCON!.', {
+                reply_to: id
+            });
+        }
+    }else{
+        context.send('Для обращения к серверу, используйте "/" в начале сообщения.', {
+            reply_to: id
+        });
+    }
+
+    return next();
 });
 
-vk.updates.start().then(()=> {
-    console.log("RCON-Бот успешно запущен!");
-    console.log(`
-* @author LiteCoreTeam
-* @version 1.0.0
-* @github https://github.com/LiteCoreTeam/node-vk-rcon
-* @vk https://vk.com/litecore_team
-* @telegram https://t.me/litecoreteam
-`);
-}).catch((err)=> console.error(err));
+rcon.on('auth', ()=> {
+    console.log(`RCON > Успешно авторизировался!`);
+}).on('error', (err)=> {
+    console.error('RCON > Произошла ошибка: ', err);
+}).on('end', ()=> {
+    console.log('RCON > Закрываю соединение.');
+});
+
+updates.start()
+.then(()=> console.log('RCON-бот запущен!'))
+.catch(err=> console.error('При запуске произошла ошибка:', err));
